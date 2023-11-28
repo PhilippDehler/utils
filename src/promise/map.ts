@@ -1,5 +1,5 @@
 import { promiseAll } from "./all";
-import { limitConcurrency } from "./limitConcurrency";
+import { limit } from "./limit";
 
 /**
  * Like `array.map` but with async callbacks. Additionally you have to supply a maxConcurrency. The implementation has to make sure that the callback is not running more than `maxConcurrency` instances at the same time.
@@ -41,6 +41,6 @@ export function promiseMap<TItem, TOutput>(
   items: TItem[],
   callback: (item: TItem, index: number, items: TItem[]) => Promise<TOutput>
 ): Promise<TOutput[]> {
-  const limitedCallback = limitConcurrency(maxConcurrency, callback);
+  const limitedCallback = limit(maxConcurrency, callback);
   return promiseAll(items.map(limitedCallback));
 }

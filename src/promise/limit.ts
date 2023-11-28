@@ -1,4 +1,4 @@
-export function limitConcurrency<TArgs extends any[], TReturnType>(
+export function limit<TArgs extends any[], TReturnType>(
   maxConcurrency: number,
   func: (...args: TArgs) => Promise<TReturnType>
 ): (...args: TArgs) => Promise<TReturnType> {

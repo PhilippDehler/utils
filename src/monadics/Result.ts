@@ -69,6 +69,10 @@ export class Result<Data = unknown, Err = unknown> {
     return res instanceof Result ? res : new Result({ data: res });
   }
 
+  assertData(): asserts this is Result<Data, never> {
+    if (this.#hasErr(this.internal)) throw this.internal.error;
+  }
+
   unwrap(): Data {
     if (this.#hasErr(this.internal))
       throw this.internal.error instanceof Error
@@ -90,18 +94,3 @@ export class Result<Data = unknown, Err = unknown> {
     return m.data(this.internal.data);
   }
 }
-
-function test(): Result<string, string> {
-  return Math.random() < 0.5 ? Result.Ok("") : Result.Err("new Error()");
-}
-
-function couldthrow(): Result<number, Error> {
-  if (Math.random() < 0.5) return Result.Err(new Error("hello"));
-  return Result.Ok(1);
-}
-console.log(
-  couldthrow()
-    .map((r) => r * 2)
-    .unwrapOr(10)
-);
-// ^?

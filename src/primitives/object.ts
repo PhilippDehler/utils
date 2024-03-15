@@ -1,3 +1,5 @@
+import { isKeyOf } from "../guards/isKeyof";
+
 type Obj = Record<PropertyKey, unknown>;
 
 export function entries<T extends Obj>(
@@ -34,13 +36,6 @@ export function assign<Target extends Obj, Sources extends Obj[]>(
   ...sources: Sources
 ): ObjectAssign<Target, Sources> {
   return Object.assign(target, ...sources);
-}
-
-export function isKeyOf<const Key extends PropertyKey>(
-  obj: unknown,
-  key: Key
-): obj is { [K in Key]: unknown } {
-  return !!obj && typeof obj === "object" && key in obj;
 }
 
 type ConstructPath<Keys extends PropertyKey[]> = Keys extends [

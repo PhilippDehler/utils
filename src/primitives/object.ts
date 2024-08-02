@@ -54,3 +54,9 @@ export function hasPath<Keys extends PropertyKey[]>(
   if (isKeyOf(obj, head)) return hasPath(obj, ...tail);
   return false;
 }
+
+export type OptionalKeys<T> = keyof {
+  [K in keyof T as {} extends Pick<T, K> ? K : never]: T[K];
+};
+
+export type RequiredKeys<T> = Exclude<keyof T, OptionalKeys<T>>;

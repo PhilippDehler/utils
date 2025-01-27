@@ -1,13 +1,13 @@
-import { AnyFn } from "./type";
+import { AnyFn<Args,Return> } from "./type";
 
-export type Curry<Fn extends AnyFn> = Parameters<Fn> extends [
+export type Curry<Fn extends AnyFn<Args,Return>> = Parameters<Fn> extends [
   infer First,
   ...infer Rest
 ]
   ? (arg: First) => Curry<(...rest: Rest) => ReturnType<Fn>>
   : ReturnType<Fn>;
 
-export function curry<T extends AnyFn, TAgg extends unknown[]>(
+export function curry<T extends AnyFn<Args,Return>, TAgg extends unknown[]>(
   func: T,
   agg?: TAgg
 ): Curry<T> {

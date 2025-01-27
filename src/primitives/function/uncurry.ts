@@ -1,10 +1,10 @@
-import { AnyFn } from "./type";
+import { AnyFn<Args,Return> } from "./type";
 
-type AggArgs<Fn> = Fn extends AnyFn
+type AggArgs<Fn> = Fn extends AnyFn<Args,Return>
   ? [...Parameters<Fn>, ...AggArgs<ReturnType<Fn>>]
   : [];
-type GetRet<Fn> = Fn extends AnyFn
-  ? ReturnType<Fn> extends AnyFn
+type GetRet<Fn> = Fn extends AnyFn<Args,Return>
+  ? ReturnType<Fn> extends AnyFn<Args,Return>
     ? GetRet<ReturnType<Fn>>
     : ReturnType<Fn>
   : Fn;

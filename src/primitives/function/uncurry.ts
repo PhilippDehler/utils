@@ -1,17 +1,11 @@
-import { AnyFn<Args,Return> } from "./type";
+import { Fn } from "./type";
 
-type AggArgs<Fn> = Fn extends AnyFn<Args,Return>
-  ? [...Parameters<Fn>, ...AggArgs<ReturnType<Fn>>]
-  : [];
-type GetRet<Fn> = Fn extends AnyFn<Args,Return>
-  ? ReturnType<Fn> extends AnyFn<Args,Return>
-    ? GetRet<ReturnType<Fn>>
-    : ReturnType<Fn>
-  : Fn;
-type Uncurry<Fn> = (...args: AggArgs<Fn>) => GetRet<Fn>;
+type AggArgs<TFn> = TFn extends Fn ? [...Parameters<TFn>, ...AggArgs<ReturnType<TFn>>] : [];
+type GetRet<TFn> = TFn extends Fn ? (ReturnType<TFn> extends Fn ? GetRet<ReturnType<TFn>> : ReturnType<TFn>) : TFn;
+type Uncurry<TFn> = (...args: AggArgs<TFn>) => GetRet<TFn>;
 
-function uncurry<T>(fn: T): Uncurry<T> {
-  let f = fn;
+export function uncurry<T>(tFn: T): Uncurry<T> {
+  let f = tFn;
   return (...args: any[]): any => {
     let _args: any[] = args;
     let currentArgs: any[] = [];

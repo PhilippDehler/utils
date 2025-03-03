@@ -4,7 +4,7 @@
     /* Language and Environment */
     "target": "esNext", /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
     /* Modules */
-    "module": "CommonJS", /* Specify what module code is generated. */
+    "module": "NodeNext", /* Specify what module code is generated. */
     "esModuleInterop": true, /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
     // "preserveSymlinks": true,                         /* Disable resolving symlinks to their realpath. This correlates to the same flag in node. */
     "forceConsistentCasingInFileNames": true, /* Ensure that casing is correct in imports. */
@@ -13,5 +13,8 @@
     "noUnusedLocals": true, /* Enable error reporting when local variables aren't read. */
     "noFallthroughCasesInSwitch": true, /* Enable error reporting for fallthrough cases in switch statements. */
     "noUncheckedIndexedAccess": true, /* Add 'undefined' to a type when accessed using an index. */
+    "skipDefaultLibCheck": false,
+    "skipLibCheck": false,
+    "noEmit": true
   }
 }

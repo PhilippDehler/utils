@@ -79,7 +79,7 @@ export class Optional<T> {
   }
 }
 
-type Guard<A, B extends A> = (value: A) => value is B;
+export type Guard<A, B extends A> = (value: A) => value is B;
 
 /**
  * Lifts a function to operate on Optional values.

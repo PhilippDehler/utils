@@ -1,6 +1,6 @@
 export function limit<TArgs extends any[], TReturnType>(
   maxConcurrency: number,
-  func: (...args: TArgs) => Promise<TReturnType>
+  func: (...args: TArgs) => Promise<TReturnType>,
 ): (...args: TArgs) => Promise<TReturnType> {
   let queue: (() => Promise<void>)[] = [];
   let runningRequests = 0;

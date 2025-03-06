@@ -1,8 +1,4 @@
-export type Equals<X, Y> = (<T>() => T extends X ? 1 : 2) extends <
-  T
->() => T extends Y ? 1 : 2
-  ? true
-  : false;
+export type Equals<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? true : false;
 
 export type Print<T> = [T] extends [never]
   ? `never`
@@ -34,10 +30,7 @@ export type Print<T> = [T] extends [never]
     : "[Object object]"
   : never;
 
-type PrintArray<T extends unknown[], Agg extends string = "["> = T extends [
-  infer Head,
-  ...infer Tail
-]
+type PrintArray<T extends unknown[], Agg extends string = "["> = T extends [infer Head, ...infer Tail]
   ? PrintArray<Tail, `${Agg}${Agg extends "[" ? "" : ", "}${Print<Head>}`>
   : `${Agg}]`;
 

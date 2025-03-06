@@ -15,6 +15,7 @@
     "noUncheckedIndexedAccess": true, /* Add 'undefined' to a type when accessed using an index. */
     "skipDefaultLibCheck": false,
     "skipLibCheck": false,
-    "noEmit": true
+    "noEmit": true,
+    "noImplicitThis": true
   }
 }

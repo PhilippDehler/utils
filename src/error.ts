@@ -21,6 +21,6 @@ export function tryCatchAsync<T>(fn: () => Promise<T>): Promise<[T, null] | [nul
     .catch((error): [T | null, Error] => [null, toError(error)] as const) as any;
 }
 
-export function exeption<T>(error: () => never): never {
-  throw error();
+export function exception<T>(error: string): never {
+  throw new Error(error);
 }

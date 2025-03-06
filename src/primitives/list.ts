@@ -26,186 +26,166 @@ export class List<T> {
   }
 
   $map<U>(callback: (item: T, index: number) => U) {
-    for (let i = 0; i < this.items.length; i++) {
-      (this.items[i] as any) = callback(this.items[i]!, i);
-    }
-    return this as any as List<U>;
+    return List.$map(callback)(this);
   }
   map<U>(callback: (item: T, index: number) => U) {
-    return List.from_array(this.items).$map(callback);
+    return List.$map(callback)(List.from_array(this.items));
   }
   static map<T, U>(callback: (item: T, index: number) => U) {
     return function <L extends T>(list: List<L>): List<U> {
-      return list.map(callback);
+      return List.$map(callback)(List.from_array(list.items));
     };
   }
   static $map<T, U>(callback: (item: T, index: number) => U) {
     return function <L extends T>(list: List<L>): List<U> {
-      return list.$map(callback);
+      for (let i = 0; i < list.items.length; i++) {
+        (list.items[i] as any) = callback(list.items[i]!, i);
+      }
+      return list as any as List<U>;
     };
   }
+
   $filter(predicate: (item: T, index: number) => boolean) {
-    for (let i = 0; i < this.items.length; i++) {
-      if (!predicate(this.items[i]!, i)) continue;
-      this.items.splice(i--, 1);
-    }
-    return this;
+    return List.$filter(predicate)(this);
   }
   filter(predicate: (item: T, index: number) => boolean): List<T> {
-    return List.from_array(this.items).$filter(predicate);
+    return List.filter(predicate)(this);
   }
   static filter<T>(predicate: (item: T, index: number) => boolean) {
-    return function <L extends T>(list: List<L>): List<L> {
-      return list.filter(predicate);
+    return function (list: List<T>): List<T> {
+      return List.$filter(predicate)(List.from_array(list.items));
+    };
+  }
+  static $filter<T>(predicate: (item: T, index: number) => boolean) {
+    return function (list: List<T>): List<T> {
+      for (let i = 0; i < list.items.length; i++) {
+        if (!predicate(list.items[i]!, i)) continue;
+        list.items.splice(i--, 1);
+      }
+      return list;
     };
   }
 
-  static $filter<T>(predicate: (item: T, index: number) => boolean) {
-    return function <L extends T>(list: List<L>): List<T> {
-      return list.$filter(predicate);
-    };
+  static $reverse<T>(list: List<T>): List<T> {
+    for (let i = 0; i < list.items.length; i++) {
+      list.items.unshift(list.items.pop()!);
+    }
+    return list;
+  }
+  static reverse<T>(list: List<T>): List<T> {
+    return List.from_array(list.items).$reverse();
   }
   $reverse() {
-    for (let i = 0; i < this.items.length; i++) {
-      this.items.unshift(this.items.pop()!);
-    }
-    return this;
+    return List.$reverse(this);
   }
   reverse() {
-    return List.from_array(this.items).$reverse();
-  }
-  static reverse<T>() {
-    return function <L extends T>(list: List<L>): List<L> {
-      return list.reverse();
-    };
-  }
-
-  static $reverse<T>() {
-    return function <L extends T>(list: List<L>): List<T> {
-      return list.$reverse();
-    };
+    return List.reverse(this);
   }
 
   all(predicate: (item: T, index: number) => boolean) {
-    for (let index = 0; index < this.items.length; index++) {
-      if (!predicate(this.items[index]!, index)) return false;
-    }
-    return true;
+    return List.all(predicate)(this);
   }
   static all<T>(predicate: (item: T, index: number) => boolean) {
     return function <L extends T>(list: List<L>): boolean {
-      return list.all(predicate);
+      for (let index = 0; index < list.items.length; index++) {
+        if (!predicate(list.items[index]!, index)) return false;
+      }
+      return true;
     };
   }
 
   find(predicate: (item: T, index: number) => boolean): Optional<T> {
-    for (let index = 0; index < this.items.length; index++) {
-      if (predicate(this.items[index]!, index))
-        return Some.new(this.items[index]!);
-    }
-    return None.new();
+    return List.find(predicate)(this);
   }
   static find<T>(predicate: (item: T, index: number) => boolean) {
     return function <L extends T>(list: List<L>): Optional<L> {
-      return list.find(predicate);
+      for (let index = 0; index < list.items.length; index++) {
+        if (predicate(list.items[index]!, index)) return Some.new(list.items[index]!);
+      }
+      return None.new();
     };
   }
+
   slice(start: number, end: number) {
-    const sliced = List.empty<T>();
-    for (let index = start; index < Math.min(this.items.length, end); index++) {
-      sliced.$push(this.items[index]!);
-    }
-    return sliced;
+    return List.slice(start, end)(this);
   }
   static slice<T>(start: number, end: number) {
     return function <L extends T>(list: List<L>): List<T> {
-      return list.slice(start, end);
+      const sliced = List.empty<T>();
+      for (let index = start; index < Math.min(list.items.length, end); index++) {
+        sliced.$push(list.items[index]!);
+      }
+      return sliced;
     };
   }
 
   head() {
-    return Optional.from_maybe(this.items[0]);
+    return List.head(this);
   }
-  static head<T>() {
-    return function <L extends T>(list: List<L>): Optional<T> {
-      return list.head();
-    };
+  static head<T>(list: List<T>): Optional<T> {
+    return List.at(0)(list);
   }
   tail() {
-    return Optional.from_maybe(this.items.slice(1));
+    return List.tail(this);
   }
-  static tail<T>() {
-    return function <L extends T>(list: List<L>): Optional<T[]> {
-      return list.tail();
-    };
+  static tail<T>(list: List<T>): List<T> {
+    return List.from_array(list.items.slice(1));
   }
   last() {
     return Optional.from_maybe(this.items[this.items.length - 1]);
   }
-  static last<T>() {
-    return function <L extends T>(list: List<L>): Optional<T> {
-      return list.last();
-    };
+  static last<T>(list: List<T>): Optional<T> {
+    return List.at(list.items.length - 1)(list);
   }
+
   init() {
     return Optional.from_maybe(this.items.slice(0, this.items.length - 1));
   }
-  static init<T>() {
-    return function <L extends T>(list: List<L>): Optional<T[]> {
-      return list.init();
-    };
+  static init<T>(list: List<T>): List<T> {
+    return List.from_array(list.items.slice(0, list.items.length - 1));
   }
 
-  fold<Agg>(
-    callback: (aggregator: Agg, item: T, index: number) => Agg,
-    agg: Agg
-  ) {
-    let aggregated_value = agg;
-    for (let index = 0; index < this.items.length; index++) {
-      aggregated_value = callback(aggregated_value, this.items[index]!, index);
-    }
-    return aggregated_value;
+  fold<Agg>(callback: (aggregator: Agg, item: T, index: number) => Agg, agg: Agg) {
+    return List.fold(callback, agg)(this);
   }
-  static fold<T, Agg>(
-    callback: (aggregator: Agg, item: T, index: number) => Agg
-  ) {
-    return function (agg: Agg) {
-      return function <L extends T>(list: List<L>): Agg {
-        return list.fold(callback, agg);
-      };
+  static fold<T, Agg>(callback: (aggregator: Agg, item: T, index: number) => Agg, agg: Agg) {
+    return function <L extends T>(list: List<L>): Agg {
+      let aggregated_value = agg;
+      for (let index = 0; index < list.items.length; index++) {
+        aggregated_value = callback(aggregated_value, list.items[index]!, index);
+      }
+      return aggregated_value;
     };
   }
 
   at(index: number) {
     return Optional.from_maybe(this.items[index]);
   }
-  static at<T>(index: number) {
-    return function <L extends T>(list: List<L>): Optional<T> {
-      return list.at(index);
+  static at(index: number) {
+    return function <T>(list: List<T>): Optional<T> {
+      return Optional.from_maybe(list.items[index]);
     };
   }
 
   length() {
-    return this.items.length;
+    return List.length(this);
   }
-  static length<T>() {
-    return function <L extends T>(list: List<L>): number {
-      return list.length();
-    };
+  static length<T>(list: List<T>) {
+    return list.items.length;
   }
 
   fmap<U>(callback: (item: T, index: number) => List<U> | U) {
-    const res = List.empty<U>();
-    for (let index = 0; index < this.items.length; index++) {
-      const result = callback(this.items[index]!, index);
-      if (result instanceof List) res.$push(...result.items);
-      else res.$push(result);
-    }
-    return res;
+    return List.fmap(callback)(this);
   }
   static fmap<T, U>(callback: (item: T, index: number) => List<U> | U) {
     return function <L extends T>(list: List<L>): List<U> {
-      return list.fmap(callback);
+      const res = List.empty<U>();
+      for (let index = 0; index < list.items.length; index++) {
+        const result = callback(list.items[index]!, index);
+        if (result instanceof List) res.$push(...result.items);
+        else res.$push(result);
+      }
+      return res;
     };
   }
 

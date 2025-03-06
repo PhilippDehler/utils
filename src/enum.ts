@@ -8,11 +8,7 @@ type Pretty<T> = { [K in keyof T]: T[K] };
  * type ColorEnum = Enum<'Red' | 'Green' | 'Blue'>;
  * type Colors = InferEnum<ColorEnum>; // 'Red' | 'Green' | 'Blue'
  */
-export type InferEnum<T extends Enum<any>> = T extends Enum<
-  infer U extends Member
->
-  ? U
-  : never;
+export type InferEnum<T extends Enum<any>> = T extends Enum<infer U extends Member> ? U : never;
 
 /**
  * Represents an object where the keys and values are members of the enum.
@@ -83,11 +79,7 @@ interface CommonGuards<T extends Member> {
    * Colors.guards.isVariant(obj, 'color', 'Red'); // true
    * Colors.guards.isVariant(obj, 'color', 'Blue'); // false
    */
-  isVariant<
-    TObject extends object,
-    Key extends keyof TObject,
-    Value extends TObject[Key] & T
-  >(
+  isVariant<TObject extends object, Key extends keyof TObject, Value extends TObject[Key] & T>(
     obj: TObject,
     Key: Key,
     value: Value
@@ -146,9 +138,7 @@ type Enum<T extends Member> = Pretty<
        * stategy.Red(); // 'R'
        *
        */
-      strategy: <Strategy extends { [K in keyof EnumObject<T>]: unknown }>(
-        mappedEnum: Strategy
-      ) => Strategy;
+      strategy: <Strategy extends { [K in keyof EnumObject<T>]: unknown }>(mappedEnum: Strategy) => Strategy;
       /**
        * Returns the enum members as an array.
        * @returns An array containing the enum members.
@@ -204,33 +194,21 @@ const createGuards = <T extends Member>(members: Set<T>): Guards<T> => {
     ...(Object.fromEntries(
       members
         .values()
-        .map(
-          (member) =>
-            [guardKey(member), (value: unknown) => member === value] as const
-        )
+        .map((member) => [guardKey(member), (value: unknown) => member === value] as const)
         .toArray()
     ) as any),
     isMember: (value: unknown): value is T => members.has(value as any),
-    isVariant: <
-      TObject extends object,
-      Key extends keyof TObject,
-      Value extends TObject[Key] & T
-    >(
+    isVariant: <TObject extends object, Key extends keyof TObject, Value extends TObject[Key] & T>(
       obj: TObject,
       Key: Key,
       value: Value
     ): obj is Extract<TObject, { [K in Key]: Value }> =>
-      typeof obj === "object" &&
-      obj !== null &&
-      Key in obj &&
-      obj[Key] === value,
+      typeof obj === "object" && obj !== null && Key in obj && obj[Key] === value,
   };
 };
 
 const enumObject = <T extends Member>(members: Set<T>): EnumObject<T> => {
-  return Object.fromEntries(
-    members.values().map((member) => [member, member] as const)
-  ) as EnumObject<T>;
+  return Object.fromEntries(members.values().map((member) => [member, member] as const)) as EnumObject<T>;
 };
 
 function fromArray<const T extends Member>(members: T[]): Enum<T> {
@@ -245,9 +223,7 @@ function fromArray<const T extends Member>(members: T[]): Enum<T> {
     utils: {
       value: {
         values: () => memberSet.values(),
-        strategy: <TStrategy extends { [K in keyof EnumObject<T>]: unknown }>(
-          mappedEnum: TStrategy
-        ) => mappedEnum,
+        strategy: <TStrategy extends { [K in keyof EnumObject<T>]: unknown }>(mappedEnum: TStrategy) => mappedEnum,
         toArray() {
           return memberSet.values().toArray();
         },
@@ -277,9 +253,7 @@ type BaseMatcher<T = any, Do = any> = {
 };
 class Matcher<Members extends Member, const M extends BaseMatcher[]> {
   constructor(private matcher: M) {}
-  match<
-    Match extends BaseMatcher<Exclude<Members, M[number]["on"][number]>, any>
-  >(args: Match) {
+  match<Match extends BaseMatcher<Exclude<Members, M[number]["on"][number]>, any>>(args: Match) {
     return new Matcher<Members, [...M, Match]>([...this.matcher, args]);
   }
 
@@ -294,12 +268,7 @@ class Matcher<Members extends Member, const M extends BaseMatcher[]> {
   exhaustive(
     ..._: [Exclude<Members, M[number]["on"][number]>] extends [never]
       ? []
-      : [
-          `Exhaustive check fails for: ${Exclude<
-            Members,
-            M[number]["on"][number]
-          >}`
-        ]
+      : [`Exhaustive check fails for: ${Exclude<Members, M[number]["on"][number]>}`]
   ): (value: unknown) => ReturnType<M[number]["do"]> {
     return ((value: unknown): ReturnType<M[number]["do"]> => {
       for (const { on, do: $do } of this.matcher) {

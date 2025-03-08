@@ -1,8 +1,8 @@
-// import { it } from "vitest";
+import { it } from "vitest";
 // import { exception } from "../error";
 // import { isNil } from "../guards/isNil";
 // import { isTypeOf } from "../guards/isTypeOf";
-
+it("hello", () => {});
 // const typeParser = {
 //   string: (value: unknown): value is string => isTypeOf(value, "string"),
 //   number: (value: unknown): value is string => isTypeOf(value, "number"),
